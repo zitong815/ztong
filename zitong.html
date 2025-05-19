@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>给你的一封信</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background: #fde9f4;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: '微软雅黑', 'Arial', sans-serif;
+      transition: background 1s;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center center;
+    }
+    .envelope-container {
+      position: relative;
+      width: 320px;
+      height: 220px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      z-index: 10;
+    }
+    .envelope-container:hover {
+      transform: scale(1.04);
+    }
+    .envelope {
+      width: 100%;
+      height: 100%;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 32px #e6b9d4a0;
+      position: absolute;
+      top: 0; left: 0;
+      overflow: hidden;
+      transition: background 0.6s;
+      /* ↓ 默认不透明 */
+      opacity: 1;
+    }
+    /* 打开信封时信封变透明 */
+    .open .envelope {
+      opacity: 0.38;  /* 你可以调到0.2~0.5之间，看你喜欢的透明感 */
+      background: #fff;
+    }
+    .flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 60%;
+      background: linear-gradient(135deg, #fbb1c5 50%, #fff 50%);
+      border-radius: 16px 16px 80px 80px/30px 30px 160px 160px;
+      z-index: 2;
+      transform-origin: top center;
+      transition: transform 1s cubic-bezier(.64,.57,.67,1.53);
+      box-shadow: 0 2px 16px #fbb1c5a0;
+    }
+    .open .flap {
+      transform: rotateX(-140deg);
+    }
+    .heart {
+      position: absolute;
+      top: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 54px; height: 48px;
+      z-index: 3;
+    }
+    .heart::before, .heart::after {
+      content: "";
+      position: absolute;
+      width: 30px;
+      height: 48px;
+      background: #f66fa6;
+      border-radius: 30px 30px 0 0;
+      top: 0; left: 12px;
+    }
+    .heart::after {
+      left: 0;
+      transform: rotate(-45deg);
+    }
+    .heart::before {
+      left: 24px;
+      transform: rotate(45deg);
+    }
+    .letter-content {
+      display: none;
+      position: absolute;
+      top: 10%;
+      left: 8%;
+      width: 84%;
+      height: 78%;
+      background: #fff0fae0;
+      border-radius: 12px;
+      box-shadow: 0 2px 16px #fbb1c540;
+      padding: 28px 20px 20px 20px;
+      z-index: 4;
+      /* 关键：字体颜色黑色 */
+      color: #111 !important;
+      font-size: 18px;
+      line-height: 1.6;
+      word-break: break-all;
+      animation: fadein 2s;
+      backdrop-filter: blur(1px);
+      /* 让打开信封时信纸也有透明感，可选 */
+      transition: background 0.5s, color 0.5s;
+    }
+    .open .letter-content {
+      display: block;
+      animation: slidein 1s;
+      background: #ffffffd2;  /* 更接近纯白，有一点透明 */
+      color: #111 !important; /* 字体依旧黑色 */
+      overflow-y: auto;       /* 新增：竖向自动滚动 */
+      overflow-x: hidden;     /* 新增：横向隐藏溢出 */
+    }
+    @keyframes slidein {
+      from { opacity: 0; transform: translateY(30px);}
+      to   { opacity: 1; transform: translateY(0);}
+    }
+    .hint {
+      margin-top: 18px;
+      color: #b05b7f;
+      font-size: 17px;
+      letter-spacing: 2px;
+      animation: float 2s infinite alternate;
+      user-select: none;
+      z-index: 20;
+      background: rgba(255,255,255,0.7);
+      padding: 4px 10px;
+      border-radius: 10px;
+      transition: opacity 0.3s;
+    }
+    @keyframes float {
+      from { transform: translateY(0);}
+      to { transform: translateY(-10px);}
+    }
+    .music-info {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      background: rgba(255,255,255,0.84);
+      padding: 8px 16px;
+      border-radius: 18px;
+      font-size: 15px;
+      color: #a94e7d;
+      box-shadow: 0 2px 10px #eec0d5b8;
+      z-index: 100;
+      display: none;
+      pointer-events: none;
+      user-select: none;
+    }
+    .music-info.show {
+      display: block;
+    }
+    @media (max-width: 600px) {
+      .music-info {
+        top: 8px;
+        right: 8px;
+        font-size: 13px;
+        padding: 6px 10px;
+      }
+      .envelope-container {
+        width: 90vw;
+        height: 54vw;
+        min-width: 220px;
+        min-height: 150px;
+        max-width: 98vw;
+        max-height: 80vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="envelope-container" id="envelope">
+    <div class="envelope"></div>
+    <div class="flap"></div>
+    <div class="heart"></div>
+    <div class="letter-content">
+      <h2>亲爱的恩柠宝宝：</h2>
+      <p>
+        这是我们第一次过的520，每天都很想你。想和你去很多好玩的地方，吃很多好吃的。<br>
+希望我们能长长久久，也希望你早日康复呀！快快好起来等你康复后再给你补个好好的520。<br>
+祝你520快乐，一直爱你❤️
+       
+      </p>
+      <p style="text-align:right;">爱你的彤<br></p>
+    </div>
+  </div>
+  <div class="hint">点一下信封，看看里面有啥~</div>
+  <div class="music-info" id="music-info">
+    <b>正在播放：</b>第57次取消发送
+  </div>
+  <audio id="music" preload="auto">
+    <source src="https://github.com/Superkukujiao/love_letter/raw/main/%E7%AC%AC57%E6%AC%A1%E5%8F%96%E6%B6%88%E5%8F%91%E9%80%81.mp3" type="audio/mpeg">
+    您的浏览器不支持audio标签。
+  </audio>
+  <script>
+    const envelope = document.getElementById('envelope');
+    const music = document.getElementById('music');
+    const musicInfo = document.getElementById('music-info');
+    const hint = document.querySelector('.hint');
+    // 换成你的照片链接
+    const photoUrl = 'https://raw.githubusercontent.com/Superkukujiao/love_letter/main/zitong.jpg';
+    let isOpen = false;
+
+    envelope.onclick = function() {
+      if (!isOpen) {
+        envelope.classList.add('open');
+        music.play();
+        musicInfo.classList.add('show');
+        if (hint) hint.style.display = 'none'; // 打开信封后隐藏提示
+        // 切换背景为照片
+        document.body.style.background = `url('${photoUrl}') no-repeat center center fixed`;
+        document.body.style.backgroundSize = 'cover';
+        isOpen = true;
+      } else {
+        envelope.classList.remove('open');
+        music.pause();
+        music.currentTime = 0;
+        musicInfo.classList.remove('show');
+        if (hint) hint.style.display = ''; // 关闭信封恢复提示
+        // 恢复初始背景
+        document.body.style.background = '#fde9f4';
+        isOpen = false;
+      }
+    }
+  </script>
+</body>
+</html>
